@@ -33,7 +33,7 @@ dotenv_path = os.path.join(os.path.dirname(__file__), 'db', '.env')
 load_dotenv(dotenv_path)
 
 # Credenciales para usar VERTEX_AI
-credentials_path = r"C:/Users/Dante/Desktop/rag_docente/db/gen-lang-client-0115469242-239dc466873d.json"
+credentials_path = r"C:/Users/mfuen/OneDrive/Desktop/rag_docente_con_UI/db/gen-lang-client-0115469242-239dc466873d.json"
 if not os.path.exists(credentials_path):
     raise FileNotFoundError(
         f"No se encontró el archivo de credenciales en: {credentials_path}")
@@ -475,7 +475,7 @@ def create_strategic_search_tool(vectorstore, llm, conversation_history=None,
         legal_query = f"requisitos normativos para planificaciones educativas en {nivel} {asignatura}"
         legal_retriever = vectorstore.as_retriever(search_type="similarity", search_kwargs={
                                                    "k": 2, "filter": {"source": {"$contains": "leyes"}}})
-        legal_docs = legal_retriever.get_relevant_documents(legal_query)
+        legal_docs = legal_retriever.invoke(legal_query)
         if legal_docs:
             results.append("MARCO NORMATIVO:")
             for doc in legal_docs:
@@ -485,7 +485,7 @@ def create_strategic_search_tool(vectorstore, llm, conversation_history=None,
         orientation_query = f"orientaciones para planificación en {nivel} {asignatura}"
         orientation_retriever = vectorstore.as_retriever(search_type="similarity", search_kwargs={
                                                          "k": 2, "filter": {"source": {"$contains": "orientaciones"}}})
-        orientation_docs = orientation_retriever.get_relevant_documents(
+        orientation_docs = orientation_retriever.invoke(
             orientation_query)
         if orientation_docs:
             results.append("\nORIENTACIONES:")
@@ -496,7 +496,7 @@ def create_strategic_search_tool(vectorstore, llm, conversation_history=None,
         curriculum_query = f"objetivos de aprendizaje {nivel} {asignatura}"
         curriculum_retriever = vectorstore.as_retriever(search_type="similarity", search_kwargs={
                                                         "k": 3, "filter": {"source": {"$contains": "bases curriculares"}}})
-        curriculum_docs = curriculum_retriever.get_relevant_documents(
+        curriculum_docs = curriculum_retriever.invoke(
             curriculum_query)
         if curriculum_docs:
             results.append("\nBASES CURRICULARES:")
@@ -507,7 +507,7 @@ def create_strategic_search_tool(vectorstore, llm, conversation_history=None,
         proposal_query = f"propuesta planificación {nivel} {asignatura} {query}"
         proposal_retriever = vectorstore.as_retriever(search_type="similarity", search_kwargs={
                                                       "k": 2, "filter": {"source": {"$contains": "propuesta"}}})
-        proposal_docs = proposal_retriever.get_relevant_documents(
+        proposal_docs = proposal_retriever.invoke(
             proposal_query)
         if proposal_docs:
             results.append("\nPROPUESTAS EXISTENTES:")
@@ -518,7 +518,7 @@ def create_strategic_search_tool(vectorstore, llm, conversation_history=None,
         activity_query = f"actividades sugeridas {nivel} {asignatura} {query}"
         activity_retriever = vectorstore.as_retriever(search_type="similarity", search_kwargs={
                                                       "k": 3, "filter": {"source": {"$contains": "actividades sugeridas"}}})
-        activity_docs = activity_retriever.get_relevant_documents(
+        activity_docs = activity_retriever.invoke(
             activity_query)
         if activity_docs:
             results.append("\nACTIVIDADES SUGERIDAS:")
@@ -852,7 +852,7 @@ def create_planning_agent(llm, vectorstore):
             search_kwargs={"k": 5, "fetch_k": 10}
         )
 
-        retrieved_docs = retriever.get_relevant_documents(enhanced_query)
+        retrieved_docs = retriever.invoke(enhanced_query)
         context = "\n\n".join([doc.page_content for doc in retrieved_docs])
 
         # Generar la planificación
@@ -946,7 +946,7 @@ def create_evaluation_agent(llm, vectorstore):
             search_kwargs={"k": 5, "fetch_k": 10}
         )
 
-        retrieved_docs = retriever.get_relevant_documents(enhanced_query)
+        retrieved_docs = retriever.invoke(enhanced_query)
         context = "\n\n".join([doc.page_content for doc in retrieved_docs])
 
         # Generar la evaluación
@@ -1041,7 +1041,7 @@ def create_study_guide_agent(llm, vectorstore):
             search_kwargs={"k": 5, "fetch_k": 10}
         )
 
-        retrieved_docs = retriever.get_relevant_documents(enhanced_query)
+        retrieved_docs = retriever.invoke(enhanced_query)
         context = "\n\n".join([doc.page_content for doc in retrieved_docs])
 
         # Generar la guía
